@@ -1,0 +1,11 @@
+import mongoose from "mongoose";
+const regSchema=new mongoose.Schema({
+    uid:{type:String, required:true},
+    name:[{type:String, required:true}],
+    mobile:{type:Number, required:true},
+    safariType:{type:String, enum:{values:["T1", "T2", "T3"], message:"Sike, thats the Wrong Number"}, required:true},
+    paymentStatus:{type:Boolean, required:true},
+}, {timestamps: true});
+
+const Reg=mongoose.model("Reg", regSchema);
+export default Reg;
