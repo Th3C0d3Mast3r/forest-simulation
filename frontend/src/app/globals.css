@@ -1,195 +1,99 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
 
 :root {
-  --forest-950: #050d07;
-  --forest-900: #0a1a0e;
-  --forest-800: #112316;
-  --forest-700: #1a3320;
-  --forest-600: #224429;
-  --forest-500: #2d5c37;
-  --amber: #d97706;
-  --amber-light: #f59e0b;
-  --amber-glow: #fbbf24;
-  --gold: #b45309;
-  --text-primary: #e8f5e9;
-  --text-secondary: #9dbfa5;
-  --text-muted: #5a8065;
-  --border: rgba(45, 92, 55, 0.4);
-  --card-bg: rgba(10, 26, 14, 0.85);
-  --glass: rgba(17, 35, 22, 0.7);
+  /* Palette */
+  --p-deepest: #19270d;
+  --p-forest: #25591f;
+  --p-olive: #818c3c;
+  --p-gold: #72601b;
+  --p-amber: #593a0e;
+
+  /* Theme variables */
+  --background: #19270d;
+  --foreground: #dfe8cc;
+  --card: #1f3012;
+  --card-foreground: #dfe8cc;
+  --popover: #1f3012;
+  --popover-foreground: #dfe8cc;
+  --primary: #818c3c;
+  --primary-foreground: #f5f3e8;
+  --secondary: #25591f;
+  --secondary-foreground: #c8d9b0;
+  --muted: #1f3012;
+  --muted-foreground: #8fa878;
+  --accent: #72601b;
+  --accent-foreground: #f5f3e8;
+  --destructive: #8b3a2a;
+  --destructive-foreground: #fce8e2;
+  --border: rgba(129, 140, 60, 0.18);
+  --input: rgba(129, 140, 60, 0.12);
+  --ring: #818c3c;
+  --radius: 0.75rem;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+  html, body {
+    height: 100%;
+    overflow-y: auto;
+  }
 }
 
-html,
-body {
-  height: 100%;
-  overflow: hidden;
-  background: var(--forest-950);
-  color: var(--text-primary);
-  font-family: "Inter", sans-serif;
+/* Custom utilities */
+.glass-card {
+  background: rgba(31, 48, 18, 0.6);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--forest-900);
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--forest-600);
-  border-radius: 4px;
+  background: var(--secondary);
+  border-radius: 10px;
 }
 
-.font-mono {
-  font-family: "Space Mono", monospace;
-}
-
-.glass-card {
-  background: var(--glass);
-  border: 1px solid var(--border);
-  backdrop-filter: blur(12px);
-}
-
-.amber-glow {
-  color: var(--amber-light);
-  text-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
-}
-
-.status-green {
-  color: #4ade80;
-  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
-}
-
-.status-red {
-  color: #f87171;
-  text-shadow: 0 0 8px rgba(248, 113, 113, 0.5);
-}
-
-.status-yellow {
-  color: #fbbf24;
-}
-
-.badge-full {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.5);
-  color: #f87171;
-  font-size: 0.6rem;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-family: "Space Mono", monospace;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  animation: pulse-red 2s infinite;
-}
-
-@keyframes pulse-red {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.5;
-  }
-}
-
-.badge-available {
-  background: rgba(74, 222, 128, 0.15);
-  border: 1px solid rgba(74, 222, 128, 0.4);
-  color: #4ade80;
-  font-size: 0.6rem;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-family: "Space Mono", monospace;
-}
-
-.badge-almost {
-  background: rgba(251, 191, 36, 0.15);
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  color: #fbbf24;
-  font-size: 0.6rem;
-  padding: 1px 6px;
-  border-radius: 3px;
-  font-family: "Space Mono", monospace;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
-}
-
-.nav-item:hover {
-  background: rgba(45, 92, 55, 0.3);
-  color: var(--text-primary);
-  border-color: var(--border);
-}
-
-.nav-item.active {
-  background: rgba(45, 92, 55, 0.5);
-  color: var(--amber-light);
-  border-color: rgba(217, 119, 6, 0.4);
-}
-
-.gauge-ring {
-  transform-origin: center;
-  transform: rotate(-90deg);
-  transition: stroke-dashoffset 0.8s ease;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-in {
-  animation: fade-in 0.3s ease;
-}
-
-.view-panel {
-  animation: fade-in 0.35s ease;
-}
-
-.leaflet-container {
-  background: #0a1a0e !important;
-}
-
-.leaflet-popup-content-wrapper {
-  background: var(--forest-800) !important;
-  border: 1px solid var(--border) !important;
-  color: var(--text-primary) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6) !important;
-}
-
-.leaflet-popup-tip {
-  background: var(--forest-800) !important;
-}
-
-.leaflet-popup-close-button {
-  color: var(--text-secondary) !important;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
 }
