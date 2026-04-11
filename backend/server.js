@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import ticketRoutes from "./routes/ticekting.js";
 import rfidRoutes from "./routes/rfid.js";
+import simulationRoutes from "./routes/simulation.js";
 
 const app = express();
 dotenv.config();
@@ -35,6 +36,7 @@ app.get("/", (req, res) => {
 
 app.use("/ticket", ticketRoutes);
 app.use("/rfid", rfidRoutes);
+app.use("/simulation", simulationRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
