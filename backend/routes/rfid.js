@@ -1,0 +1,11 @@
+import express from "express";
+import { assignRfid, getRfidByTag, getRfidByUid, deactivateRfid } from "../controllers/rfid.js";
+
+const router = express.Router();
+
+router.post("/assign", assignRfid);
+router.get("/tag/:rfid", getRfidByTag);
+router.get("/uid/:uid", getRfidByUid);
+router.delete("/deactivate/:rfid", deactivateRfid);
+
+export default router;
