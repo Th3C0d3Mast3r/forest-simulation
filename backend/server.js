@@ -9,19 +9,19 @@ import simulationRoutes from "./routes/simulation.js";
 const app = express();
 dotenv.config();
 
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("[SUCCESS] MongoDB Connected");
-  } catch (err) {
-    console.error("[FAILED] MongoDB Connection:", err.message);
-    process.exit(1);
-  }
-};
-connectDB();
+// const connectDB = async () => {
+//   try {
+//     await mongoose.connect(process.env.MONGO_URI, {
+//       useNewUrlParser: true,
+//       useUnifiedTopology: true,
+//     });
+//     console.log("[SUCCESS] MongoDB Connected");
+//   } catch (err) {
+//     console.error("[FAILED] MongoDB Connection:", err.message);
+//     process.exit(1);
+//   }
+// };
+// connectDB();
 
 app.use(cors({
     origin: "*",
