@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Play, Pause, RotateCcw, Activity, Satellite, Eye, MapPin as PinIcon, CheckCircle2, Download, X } from "lucide-react";
+import { Play, Pause, RotateCcw, Activity, Satellite, Eye, MapPin as PinIcon, CheckCircle2, Download, X, ScanLine } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { AnimatePresence, motion } from "framer-motion";
 
 const TRACK_WAYPOINTS = [
   // Precise track from the user ref image
@@ -56,6 +57,24 @@ export default function WildlifePage() {
 
   useEffect(() => {
     setUnitId(`UNIT-${Math.floor(100 + Math.random() * 900)}`);
+  }, []);
+
+  const [taps, setTaps] = useState([]);
+
+  // RFID Stream subscription
+  useEffect(() => {
+    const eventSource = new EventSource("http://localhost:5000/rfid/stream");
+    
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type !== "ping") {
+        const newTap = { ...data, id: Date.now() + Math.random() };
+        setTaps((prev) => [...prev, newTap]);
+        setTimeout(() => setTaps((prev) => prev.filter(t => t.id !== newTap.id)), 5000);
+      }
+    };
+
+    return () => eventSource.close();
   }, []);
 
   const progressRef = useRef(0);
@@ -338,9 +357,8 @@ export default function WildlifePage() {
         </div>
 
         {/* IOT SENSOR SUITE */}
-        {isRunning && (
-            <div className="absolute top-6 right-6 z-[1000] w-60 space-y-3">
-                <Card className="bg-zinc-800/40 backdrop-blur-3xl border border-white/10 p-3 rounded-2xl shadow-2xl">
+        <div className="absolute top-6 right-6 z-[1000] w-60 space-y-3">
+            <Card className="bg-zinc-800/40 backdrop-blur-3xl border border-white/10 p-3 rounded-2xl shadow-2xl">
                     <div className="flex items-center gap-2 mb-3 border-b border-white/5 pb-2">
                         <Activity className="h-3 w-3 text-primary" />
                         <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white">IoT Telemetry</span>
@@ -385,7 +403,7 @@ export default function WildlifePage() {
                 </Card>
 
                 {/* LOG PANEL (Moved below IoT for stack) */}
-                {detections.length > 0 && (
+                {isRunning && detections.length > 0 && (
                     <Card className="bg-zinc-800/40 backdrop-blur-2xl border border-white/10 p-4 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-500">
                         <div className="flex items-center gap-2 mb-3 border-b border-white/5 pb-2">
                             <Eye className="h-3 w-3 text-primary" />
@@ -406,8 +424,7 @@ export default function WildlifePage() {
                         </div>
                     </Card>
                 )}
-            </div>
-        )}
+        </div>
 
         {/* FINISH OVERLAY (The "Snapshot") */}
         {isFinished && (
@@ -501,6 +518,33 @@ export default function WildlifePage() {
                 </Card>
             </div>
         )}
+
+      {/* Toast Popups for Real-time RFID Scans */}
+      <div className="fixed bottom-8 right-8 z-[5000] flex flex-col gap-4">
+        <AnimatePresence>
+          {taps.map((tap) => (
+            <motion.div
+              key={tap.id}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, x: 20 }}
+              transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
+              className="bg-zinc-900/90 backdrop-blur-xl border border-primary/20 shadow-[0_10px_30px_rgba(192,88,0,0.15)] rounded-2xl p-5 flex items-center gap-4 w-80 relative overflow-hidden group"
+            >
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+              <div className="bg-primary/10 p-3 rounded-2xl">
+                <ScanLine className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex-1 space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Live RFID Tap • {tap.time}</p>
+                <p className="text-sm font-bold text-white leading-tight">{tap.member} & Group ({tap.groupSize})</p>
+                <p className="text-xs text-zinc-400 font-medium">Safari: <span className="text-primary font-bold">{tap.safariType}</span></p>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
       </div>
 
       <style dangerouslySetInnerHTML={{ __html: `

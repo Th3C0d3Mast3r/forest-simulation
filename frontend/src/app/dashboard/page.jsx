@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, Users, MapPin, Activity, ScanLine } from "lucide-react"
+import { TrendingUp, Users, MapPin, Activity, ScanLine, Thermometer, Droplets, Wind, Activity as VibrateIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AnimatePresence, motion } from "framer-motion"
 
 export default function DashboardPage() {
   const [taps, setTaps] = useState([]);
+  const [sensorData, setSensorData] = useState({ temp: "--", humidity: "--", gas: "--", vibration: "--" });
 
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:5000/rfid/stream");
@@ -30,6 +31,25 @@ export default function DashboardPage() {
     };
   }, []);
 
+  // Poll ESP32 Sensor Data every 5 seconds
+  useEffect(() => {
+    const fetchSensorData = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/sensor/data");
+        const json = await res.json();
+        if (json.success && json.data) {
+          setSensorData(json.data);
+        }
+      } catch (err) {
+        console.error("Error fetching sensor data", err);
+      }
+    };
+
+    fetchSensorData();
+    const intervalId = setInterval(fetchSensorData, 5000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <main className="flex flex-1 flex-col gap-8 p-8 bg-background/50 animate-in fade-in duration-700">
       {/* Quick Stats Grid */}
@@ -40,7 +60,16 @@ export default function DashboardPage() {
         <StatsCard title="Daily Revenue" value="$4,820" sub="92% Goal met" icon={TrendingUp} />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-7">
+      {/* Live ESP32 Sensor Data Grid */}
+      <h2 className="text-xl font-black text-ivory tracking-tight mt-4">Live Environment Data</h2>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <StatsCard title="Temperature" value={`${sensorData.temp || 0}°C`} sub="Core Zone Average" icon={Thermometer} />
+        <StatsCard title="Humidity" value={`${sensorData.humidity || 0}%`} sub="Canopy Moisture" icon={Droplets} />
+        <StatsCard title="Air Quality (AQI)" value={sensorData.gas || 0} sub="Gas Concentration" icon={Wind} />
+        <StatsCard title="Seismic / Vibration" value={sensorData.vibration || 0} sub="Geophone Status" icon={VibrateIcon} />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-7 mt-4">
         {/* Primary Monitoring Panel */}
         <Card className="md:col-span-4 bg-card border-none shadow-[0_8px_30px_rgba(74,60,49,0.05)] rounded-2xl">
           <CardHeader>
