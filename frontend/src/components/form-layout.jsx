@@ -72,7 +72,8 @@ export default function WorkspaceForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/ticket/create", {
+      // 1. Create the ticket record in DB first
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ticket/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,14 +87,64 @@ export default function WorkspaceForm() {
         }),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert("Expedition request placed successfully!");
-      } else {
-        alert("Request Failed: " + data.message);
+      const ticketData = await response.json();
+      if (!response.ok) {
+        return alert("Request Failed: " + ticketData.message);
       }
+
+      // 2. Get PayU Hash
+      const hashResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/payment/hash`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: totalPrice,
+          productinfo: formData.safariType,
+          firstname: formData.names[0],
+          email: "test@example.com", // Static for now, can be made dynamic
+          phone: formData.mobile,
+          uid: formData.uid,
+        }),
+      });
+
+      const hashData = await hashResponse.json();
+      if (!hashResponse.ok) {
+        return alert("Payment initialization failed");
+      }
+
+      // 3. Redirect to PayU
+      const payuData = {
+        key: hashData.key,
+        txnid: hashData.txnid,
+        amount: hashData.amount,
+        firstname: hashData.firstname,
+        email: hashData.email,
+        phone: hashData.phone,
+        productinfo: hashData.productinfo,
+        surl: `${process.env.NEXT_PUBLIC_API_URL}/payment/success`,
+        furl: `${process.env.NEXT_PUBLIC_API_URL}/payment/failure`,
+        hash: hashData.hash,
+        service_provider: "payu_paisa",
+      };
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = hashData.action;
+
+      for (const key in payuData) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = key;
+        input.value = payuData[key];
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
     } catch (error) {
       alert("Error connecting to server");
+      console.error(error);
     }
   };
 

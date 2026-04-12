@@ -47,3 +47,16 @@ export const getTicket = async (req, res) => {
         res.status(500).json({message: "Server error", error: error.message});
     }
 };
+
+export const getTicketByUid = async (req, res) => {
+    try {
+        const {uid} = req.params;
+        const reg = await Reg.findOne({uid});
+        if (!reg) {
+            return res.status(404).json({message: "Ticket not found"});
+        }
+        res.status(200).json({message: "Ticket retrieved successfully", reg});
+    } catch (error) {
+        res.status(500).json({message: "Server error", error: error.message});
+    }
+};

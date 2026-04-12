@@ -5,23 +5,21 @@ import dotenv from "dotenv";
 import ticketRoutes from "./routes/ticekting.js";
 import rfidRoutes from "./routes/rfid.js";
 import simulationRoutes from "./routes/simulation.js";
+import sensorRoutes from "./routes/sensor.js";
+import paymentRoutes from "./routes/payment.js";
 
 const app = express();
 dotenv.config();
 
-// const connectDB = async () => {
-//   try {
-//     await mongoose.connect(process.env.MONGO_URI, {
-//       useNewUrlParser: true,
-//       useUnifiedTopology: true,
-//     });
-//     console.log("[SUCCESS] MongoDB Connected");
-//   } catch (err) {
-//     console.error("[FAILED] MongoDB Connection:", err.message);
-//     process.exit(1);
-//   }
-// };
-// connectDB();
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("[SUCCESS] MongoDB Connected");
+  } catch (err) {
+    console.error("[FAILED] MongoDB Connection:", err.message);
+  }
+};
+connectDB();
 
 app.use(cors({
     origin: "*",
@@ -29,6 +27,7 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
     res.send("Base Route Running");
@@ -37,8 +36,13 @@ app.get("/", (req, res) => {
 app.use("/ticket", ticketRoutes);
 app.use("/rfid", rfidRoutes);
 app.use("/simulation", simulationRoutes);
+app.use("/sensor", sensorRoutes);
+app.use("/payment", paymentRoutes);
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`[SUCCESS] Simulation Server running on port ${PORT}`);
 });
+
+export default app;

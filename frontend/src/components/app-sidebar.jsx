@@ -24,9 +24,9 @@ import {
 
 const data = {
   user: {
-    name: "Chief Ranger",
-    email: "ranger@forestreserve.gov",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100&h=100",
+    name: "Admin",
+    email: "admin@forest.com",
+    avatar: "https://www.shutterstock.com/image-vector/admin-avatar-manager-profile-user-260nw-2670442955.jpg",
   },
   projects: [
     {

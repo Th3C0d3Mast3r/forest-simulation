@@ -136,6 +136,11 @@ function Sidebar({
   ...props
 }) {
   const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   if (collapsible === "none") {
     return (
@@ -151,7 +156,7 @@ function Sidebar({
     );
   }
 
-  if (isMobile) {
+  if (isMobile && mounted) {
     return (
       <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
         <SheetContent
