@@ -57,17 +57,17 @@ export const paymentResponse = async (req, res) => {
         const { status, txnid } = data;
 
         if (!status || !txnid) {
-            return res.redirect(`${process.env.FRONTEND_URL}/dashboard/payment-failure`);
+            return res.redirect(`${process.env.FRONTEND_URL}/ticket?payment=failed`);
         }
 
         if (status === "success") {
              await Reg.findOneAndUpdate({ uid: txnid }, { paymentStatus: true });
-             return res.redirect(`${process.env.FRONTEND_URL}/dashboard/payment-success?txid=${txnid}`);
+             return res.redirect(`${process.env.FRONTEND_URL}/ticket?payment=success&txid=${txnid}`);
         } else {
-             return res.redirect(`${process.env.FRONTEND_URL}/dashboard/payment-failure?txid=${txnid}`);
+             return res.redirect(`${process.env.FRONTEND_URL}/ticket?payment=failed&txid=${txnid}`);
         }
     } catch (error) {
         console.error("Payment response error:", error);
-        res.redirect(`${process.env.FRONTEND_URL}/dashboard/payment-failure`);
+        res.redirect(`${process.env.FRONTEND_URL}/ticket?payment=failed`);
     }
 };

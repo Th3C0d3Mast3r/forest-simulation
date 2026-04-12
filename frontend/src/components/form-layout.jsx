@@ -286,7 +286,7 @@ export default function WorkspaceForm() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <span className="text-3xl font-black text-bark tracking-tighter">${option.price}</span>
+                        <span className="text-3xl font-black text-bark tracking-tighter">₹{option.price}</span>
                         <p className="text-[10px] font-black text-bark/60 uppercase tracking-widest mt-1">Per Head</p>
                       </div>
                     </div>
@@ -324,7 +324,7 @@ export default function WorkspaceForm() {
                       <p className="text-[10px] text-ivory/40 italic font-bold tracking-tight">Verified upon arrival</p>
                     </div>
                     <div className="text-6xl font-black tracking-tighter text-ivory tabular-nums drop-shadow-md">
-                      ${totalPrice}
+                      ₹{totalPrice}
                     </div>
                   </div>
                 </div>
