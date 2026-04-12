@@ -1,19 +1,18 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, Ticket, ArrowRight, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import "../../globals.css";
 
-const PaymentSuccess = () => {
+const SuccessContent = () => {
     const searchParams = useSearchParams();
     const txid = searchParams.get('txid');
     const [ticketData, setTicketData] = useState(null);
 
     useEffect(() => {
         if (txid) {
-            // Fetch ticket details if needed
             fetch(`${process.env.NEXT_PUBLIC_API_URL}/ticket/get-by-uid/${txid}`)
                 .then(res => res.json())
                 .then(data => setTicketData(data.reg))
@@ -64,5 +63,13 @@ const PaymentSuccess = () => {
         </div>
     );
 };
+
+const PaymentSuccess = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <SuccessContent />
+        </Suspense>
+    );
+}
 
 export default PaymentSuccess;

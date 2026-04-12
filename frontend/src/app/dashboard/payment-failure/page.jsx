@@ -1,12 +1,12 @@
 "use client";
-import React from 'react';
+import React, { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { XCircle, RefreshCw, MessageCircle, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import "../../globals.css";
 
-const PaymentFailure = () => {
+const FailureContent = () => {
     const searchParams = useSearchParams();
     const txid = searchParams.get('txid');
 
@@ -64,5 +64,13 @@ const PaymentFailure = () => {
         </div>
     );
 };
+
+const PaymentFailure = () => {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <FailureContent />
+        </Suspense>
+    );
+}
 
 export default PaymentFailure;

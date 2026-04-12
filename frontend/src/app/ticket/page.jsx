@@ -1,12 +1,12 @@
 "use client";
 
 import FormLayout from '@/components/form-layout'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { CheckCircle2, XCircle, X, Copy, Check } from 'lucide-react'
 import "../globals.css"
 
-const Ticket = () => {
+const TicketContent = () => {
   const searchParams = useSearchParams();
   const payment = searchParams.get('payment');
   const txid = searchParams.get('txid');
@@ -34,7 +34,7 @@ const Ticket = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <>
         <FormLayout />
 
         {showPopup && (
@@ -123,6 +123,16 @@ const Ticket = () => {
             </div>
           </div>
         )}
+    </>
+  );
+};
+
+const Ticket = () => {
+  return (
+    <div className="min-h-screen bg-background relative">
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-bark font-black uppercase tracking-[0.4em]">Loading...</div>}>
+            <TicketContent />
+        </Suspense>
     </div>
   )
 }
