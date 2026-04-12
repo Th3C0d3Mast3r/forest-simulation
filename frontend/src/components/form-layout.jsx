@@ -125,7 +125,11 @@ export default function WorkspaceForm() {
         surl: `${process.env.NEXT_PUBLIC_API_URL}/payment/success`,
         furl: `${process.env.NEXT_PUBLIC_API_URL}/payment/failure`,
         hash: hashData.hash,
-        service_provider: "payu_paisa",
+        udf1: "",
+        udf2: "",
+        udf3: "",
+        udf4: "",
+        udf5: "",
       };
 
       const form = document.createElement("form");

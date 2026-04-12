@@ -12,29 +12,35 @@ export const generateHash = async (req, res) => {
             return res.status(400).json({ message: "Missing required fields" });
         }
 
-        const txnid = uid || ("T" + Date.now() + Math.floor(Math.random() * 1000));
+        const txnid = uid || ("TXN" + Date.now() + Math.floor(Math.random() * 1000));
+        const formattedAmount = parseFloat(amount).toFixed(1);
         
         const key = process.env.PAYU_KEY;
         const salt = process.env.PAYU_SALT;
+        const udf1 = "";
+        const udf2 = "";
+        const udf3 = "";
+        const udf4 = "";
+        const udf5 = "";
         
-        // Hash Formula: sha512(key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||salt)
-        const hashString = `${key}|${txnid}|${amount}|${productinfo}|${firstname}|${email}|||||||||||${salt}`;
+        const hashString = `${key}|${txnid}|${formattedAmount}|${productinfo}|${firstname}|${email}|${udf1}|${udf2}|${udf3}|${udf4}|${udf5}||||||${salt}`;
+        
+        console.log("[PAYU] Hash input string:", hashString);
+        
         const hash = crypto.createHash("sha512").update(hashString).digest("hex");
+
+        console.log("[PAYU] Generated hash:", hash);
+        console.log("[PAYU] TxnID:", txnid, "Amount:", formattedAmount);
 
         res.status(200).json({
             hash,
             txnid,
             key,
-            udf1: "",
-            udf2: "",
-            udf3: "",
-            udf4: "",
-            udf5: "",
-            amount,
+            amount: formattedAmount,
             productinfo,
             firstname,
             email,
-            phone,
+            phone: phone || "9999999999",
             action: process.env.PAYU_BASE_URL
         });
     } catch (error) {
@@ -45,20 +51,16 @@ export const generateHash = async (req, res) => {
 
 export const paymentResponse = async (req, res) => {
     try {
-        // PayU sends data in body for POST, and sometimes in query for GET
         const data = req.method === "POST" ? req.body : req.query;
-        const { status, txnid, amount, productinfo, firstname, email, hash } = data;
+        console.log("[PAYU] Response received:", req.method, data);
+
+        const { status, txnid } = data;
 
         if (!status || !txnid) {
-            // If no data is present (e.g. manual GET or cancel), redirect to failure
             return res.redirect(`${process.env.FRONTEND_URL}/dashboard/payment-failure`);
         }
 
-        const salt = process.env.PAYU_SALT;
-        const key = process.env.PAYU_KEY;
-
         if (status === "success") {
-             // Hash verification (Simplified for now)
              await Reg.findOneAndUpdate({ uid: txnid }, { paymentStatus: true });
              return res.redirect(`${process.env.FRONTEND_URL}/dashboard/payment-success?txid=${txnid}`);
         } else {
