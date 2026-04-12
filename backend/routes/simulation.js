@@ -1,3 +1,4 @@
+import { log } from "console";
 import express from "express";
 const router = express.Router();
 
@@ -16,6 +17,7 @@ router.post("/start", (req, res) => {
     speed: speed || 1,
     detections: [] // Clear detections on new start
   };
+  log("Simulation started", simulationState);
   res.json({ success: true, message: "Simulation started", state: simulationState });
 });
 
