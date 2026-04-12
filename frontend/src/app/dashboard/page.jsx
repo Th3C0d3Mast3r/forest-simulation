@@ -1,10 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp, Users, MapPin, Activity } from "lucide-react"
+import { TrendingUp, Users, MapPin, Activity, ScanLine } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AnimatePresence, motion } from "framer-motion"
 
 export default function DashboardPage() {
+  const [taps, setTaps] = useState([]);
+
+  useEffect(() => {
+    const eventSource = new EventSource("http://localhost:5000/rfid/stream");
+    
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type !== "ping") {
+        const newTap = { ...data, id: Date.now() + Math.random() };
+        setTaps((prev) => [...prev, newTap]);
+        
+        // Remove tap popup after 5 seconds to match elegant real-time UI
+        setTimeout(() => {
+          setTaps((prev) => prev.filter(t => t.id !== newTap.id));
+        }, 5000);
+      }
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
   return (
     <main className="flex flex-1 flex-col gap-8 p-8 bg-background/50 animate-in fade-in duration-700">
       {/* Quick Stats Grid */}
@@ -42,6 +67,32 @@ export default function DashboardPage() {
             <AlertItem time="09:00 AM" title="Heavy Rainfall Prep" desc="Zone C routes may be muddy." status="normal" />
           </CardContent>
         </Card>
+      </div>
+
+      {/* Toast Popups for Real-time RFID Scans */}
+      <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-4">
+        <AnimatePresence>
+          {taps.map((tap) => (
+            <motion.div
+              key={tap.id}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, x: 20 }}
+              transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
+              className="bg-card border border-primary/20 shadow-[-10px_10px_30px_rgba(74,60,49,0.15)] rounded-2xl p-5 flex items-center gap-4 w-80 relative overflow-hidden group"
+            >
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+              <div className="bg-primary/10 p-3 rounded-2xl">
+                <ScanLine className="w-6 h-6 text-primary" />
+              </div>
+              <div className="flex-1 space-y-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Live RFID Tap • {tap.time}</p>
+                <p className="text-sm font-bold text-bark leading-tight">{tap.member} & Group ({tap.groupSize})</p>
+                <p className="text-xs text-muted-foreground font-medium">Safari: <span className="text-primary font-bold">{tap.safariType}</span></p>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </main>
   );

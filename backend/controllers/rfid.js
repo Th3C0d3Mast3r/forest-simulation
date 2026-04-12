@@ -1,5 +1,8 @@
 import Rfid from "../models/rfid.model.js";
 import Reg from "../models/reg.model.js";
+import { EventEmitter } from "events";
+
+export const rfidEvents = new EventEmitter();
 
 export const assignRfid = async (req, res) => {
     try {
@@ -64,6 +67,15 @@ export const getRfidByTag = async (req, res) => {
             return res.status(404).json({ message: "RFID tag not found or has expired" });
         }
 
+        // Emit tap event for real-time dashboard tracking
+        rfidEvents.emit("tap", {
+            rfid: rfidDoc.rfid,
+            groupSize: rfidDoc.value,
+            member: rfidDoc.regId?.name?.[0] || "Unknown Member",
+            safariType: rfidDoc.regId?.safariType,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        });
+
         return res.status(200).json({
             message: "RFID found",
             rfid: rfidDoc,
@@ -122,4 +134,24 @@ export const deactivateRfid = async (req, res) => {
         console.error("Error deactivating RFID:", error);
         res.status(500).json({ message: "Server error", error: error.message });
     }
+};
+
+export const rfidStream = (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    // Send an initial ping to establish connection
+    res.write(`data: ${JSON.stringify({ type: "ping" })}\n\n`);
+
+    const sendEvent = (data) => {
+        res.write(`data: ${JSON.stringify(data)}\n\n`);
+    };
+
+    rfidEvents.on('tap', sendEvent);
+
+    req.on('close', () => {
+        rfidEvents.off('tap', sendEvent);
+    });
 };
