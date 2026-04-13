@@ -68,3 +68,13 @@ The advanced interactive Map View component built on top of **Leaflet**.
 * **Persistent Telemetry**: The IoT panel is permanently pinned top-right. Regardless of if a car is moving, the ESP32 data continues to live-refresh.
 * **RFID Support**: The Map UI is fully configured to intercept `/rfid/stream` popups so the operator never misses a gate-tap while analyzing the map.
 * **End-of-Trip Report Generation**: When `/simulation/status` concludes, the frontend triggers a massive "Mission Success" UI snapshot overlay. It summarizes average temperature, humidity, run-time, and provides a one-click **Save Data** button to export a structured local `.json` file of the telemetry for analytics.
+
+---
+
+## TEAM
+- Akib Patel (Hardware + Hardware Code)
+- Adnan Khan (Hardware)
+- Devesh Acharya (Hardware Bug + Software)
+- Fayyaz Shaikh (Hardware + Hardware Code)
+- Neeraj Mahajan (ML pipeline and Integration)
+- Rehan Ansari (Software)
